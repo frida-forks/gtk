@@ -3020,12 +3020,15 @@ gdk_event_translate (MSG *msg,
       if (_gdk_win32_surface_solid_csd(surface))
         {
           RECT *client_rect = &((NCCALCSIZE_PARAMS *) msg->lParam)->rgrc[0];
-          client_rect->left += 8;
-          client_rect->right -= 8;
-          client_rect->bottom -= 8;
+          int frame_x, frame_y;
+
+          _gdk_win32_surface_get_frame_size (msg->hwnd, &frame_x, &frame_y);
+          client_rect->left += frame_x;
+          client_rect->right -= frame_x;
+          client_rect->bottom -= frame_y;
 
           if (IsZoomed (msg->hwnd))
-            client_rect->top += 8;
+            client_rect->top += frame_y;
         }
 
       *ret_valp = 0;

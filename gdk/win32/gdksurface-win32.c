@@ -194,11 +194,14 @@ _gdk_win32_adjust_client_rect (GdkSurface *surface,
 
   if (_gdk_win32_surface_solid_csd (surface))
     {
-      rect->left -= 8;
-      rect->right += 8;
-      rect->bottom += 8;
+      int frame_x, frame_y;
+
+      _gdk_win32_surface_get_frame_size (GDK_SURFACE_HWND (surface), &frame_x, &frame_y);
+      rect->left -= frame_x;
+      rect->right += frame_x;
+      rect->bottom += frame_y;
       if (IsZoomed (GDK_SURFACE_HWND (surface)))
-            rect->top -= 8;
+        rect->top -= frame_y;
       return;
     }
 
@@ -1597,6 +1600,18 @@ _gdk_win32_surface_solid_csd (GdkSurface *surface)
   * which drives this.. "shadow-decorated"?
   */
   return GDK_WIN32_SURFACE (surface)->shadow_decorated;
+}
+
+void
+_gdk_win32_surface_get_frame_size (HWND  hwnd,
+                                   int  *frame_x,
+                                   int  *frame_y)
+{
+  UINT dpi = GetDpiForWindow (hwnd);
+  int padding = GetSystemMetricsForDpi (SM_CXPADDEDBORDER, dpi);
+
+  *frame_x = GetSystemMetricsForDpi (SM_CXSIZEFRAME, dpi) + padding;
+  *frame_y = GetSystemMetricsForDpi (SM_CYSIZEFRAME, dpi) + padding;
 }
 
 void

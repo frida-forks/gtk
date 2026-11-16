@@ -3169,15 +3169,16 @@ gtk_window_enable_csd (GtkWindow *window)
   GtkWindowPrivate *priv = gtk_window_get_instance_private (window);
   GtkWidget *widget = GTK_WIDGET (window);
 
+  /* With solid CSD the windowing system draws the frame and the resize
+   * borders, so neither our shadow nor the .solid-csd frame applies.
+   */
+  if (_gtk_is_solid_csd (window))
+    ;
   /* We need a visual with alpha for rounded corners */
-  if (gtk_window_is_composited (window) && !_gtk_is_solid_csd(window))
-    {
-      gtk_widget_add_css_class (widget, "csd");
-    }
+  else if (gtk_window_is_composited (window))
+    gtk_widget_add_css_class (widget, "csd");
   else
-    {
-      gtk_widget_add_css_class (widget, "solid-csd");
-    }
+    gtk_widget_add_css_class (widget, "solid-csd");
 
   priv->client_decorated = TRUE;
 }
